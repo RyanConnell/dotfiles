@@ -38,7 +38,7 @@ font-3 = FontAwesome:size=10;0
 # > modules-right = volume backlight wireless-network wired-network battery date
 
 # Desktop Config
-modules-left = powermenu mpd
+modules-left = powermenu filebrowser mpd
 modules-right = volume wireless-network wired-network date
 
 ####################################################################################
@@ -90,6 +90,8 @@ bar-fill-foreground = #c9665e
 bar-empty = ─
 bar-empty-font = 3
 bar-empty-foreground = #44
+
+####################################################################################
 
 [module/battery]
 type = internal/battery
@@ -388,6 +390,13 @@ menu-2-0-exec = sudo shutdown now
 menu-2-1 = Cancel
 menu-2-1-foreground = #fba922
 menu-2-1-exec = menu_open-0
+
+####################################################################################
+
+[module/filebrowser]
+type = custom/text
+content = " File Browser"
+click-left = xdg-open ~
 
 ####################################################################################
 
