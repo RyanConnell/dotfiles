@@ -18,5 +18,5 @@ if ! command -v zellij >/dev/null 2>&1; then
 	fi
 
 	echo "Installing zellij from ${download_url}"
-	curl -L "${download_url}" | sudo tar -xz -C $HOME/bin zellij
+	mkdir -p $HOME/bin && curl -L "${download_url}" | sudo tar -xz -C $HOME/bin zellij
 fi
