@@ -4,7 +4,7 @@
 :endif
 
 " If we are using ZSH set the theme to solarized
-:if $ZSH == '/home/rhino/.oh-my-zsh'
+:if $ZSH == "$HOME/.oh-my-zsh"
 "colorscheme solarized
 :endif
 
