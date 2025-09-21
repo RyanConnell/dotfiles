@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PACKAGES=$(ls -d */ | sed 's/\///' | xargs)
+PACKAGES=$(ls -d */ | sed 's/\///' | grep -v "backups" | xargs)
 
 # --- Ensure that Stow is installed ---
 if ! command -v stow >/dev/null 2>&1; then
