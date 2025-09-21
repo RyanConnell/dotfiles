@@ -18,6 +18,7 @@ setopt nosharehistory
 
 # Custom Aliases
 alias graph="snakeviz -H `hostname` -p 8082 -s"
+alias vim="nvim"
 
 # Custom Environment Variables
 export GOPATH=$HOME/golang
