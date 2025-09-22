@@ -3,5 +3,6 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-  { 'fatih/vim-go', go_term_enabled = 1 },
+	{ "fatih/vim-go", go_term_enabled = 1 },
+	{ "MeanderingProgrammer/render-markdown.nvim" },
 }
