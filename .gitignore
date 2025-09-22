@@ -1,3 +1,4 @@
 *.sw[a-z]
 /backups
 lazy-lock.json
+zsh/.local-zshrc

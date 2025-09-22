@@ -25,3 +25,8 @@ export GOPATH=$HOME/golang
 export PATH=$PATH:$HOME/golang/bin:/usr/local/go/bin:$HOME/bin:/opt/homebrew/bin
 export EDITOR=vim
 export VISUAL=vim
+
+# Apply any .local-zshrc settings (i.e., private settings we don't want in the repo, such as API keys)
+if [ -f $HOME/.local-zshrc ]; then
+	source $HOME/.local-zshrc
+fi
