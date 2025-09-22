@@ -35,7 +35,7 @@ done
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 for pkg in $PACKAGES; do
     # Attempt to stow
-    if ! stow -R "${pkg}" --ignore '(pre|post).sh'; then
+    if ! stow -R "${pkg}" --ignore '(pre|post).sh' -t $HOME; then
         echo "Stow for '${pkg}' failed; Attempting to backup files"
         # Find all files in the package directory, excluding pre/post scripts
         files=$(find "$pkg" -type f -not -path "*/pre.sh" -not -path "*/post.sh")
@@ -52,7 +52,7 @@ for pkg in $PACKAGES; do
         done
 
         # Attempt to stow again now that the files have been moved.
-        stow -R "$pkg" --ignore '(pre|post).sh'
+        stow -R "$pkg" --ignore '(pre|post).sh' -t $HOME
     fi
 done
 
