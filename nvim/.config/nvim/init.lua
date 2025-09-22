@@ -683,9 +683,9 @@ require("lazy").setup({
 			--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 			local servers = {
 				-- clangd = {},
-				-- gopls = {},
-				-- pyright = {},
-				-- rust_analyzer = {},
+				gopls = {},
+				pyright = {},
+				rust_analyzer = {},
 				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
 				--
 				-- Some languages (like typescript) have entire language plugins that can be useful:
@@ -1052,15 +1052,15 @@ vim.o.hlsearch = true
 
 -- Configure custom settings per filetype.
 local filetype_settings = {
-	["*"] = { ts = 3, shiftwidth = 3, colorcolumn = "0" },
-	["*.log"] = { ts = 4, shiftwidth = 4, colorcolumn = "0" },
-	["*.go"] = { ts = 4, shiftwidth = 4, colorcolumn = "101" },
-	["*.rs"] = { ts = 4, shiftwidth = 4, colorcolumn = "101" },
-	["*.c"] = { ts = 4, shiftwidth = 4, colorcolumn = "101" },
-	["*.h"] = { ts = 4, shiftwidth = 4, colorcolumn = "101" },
-	["*.py"] = { ts = 3, shiftwidth = 3, colorcolumn = "86" },
-	["*.html"] = { ts = 4, shiftwidth = 4, colorcolumn = "101" },
-	["*.Jenkinsfile"] = { ts = 4, shiftwidth = 4, colorcolumn = "101" },
+	["*"] = { ts = 4, shiftwidth = 4, colorcolumn = "0", expandtab = true },
+	["*.log"] = { ts = 4, shiftwidth = 4, colorcolumn = "0", expandtab = true },
+	["*.go"] = { ts = 4, shiftwidth = 4, colorcolumn = "101", expandtab = false },
+	["*.rs"] = { ts = 4, shiftwidth = 4, colorcolumn = "101", expandtab = false },
+	["*.c"] = { ts = 4, shiftwidth = 4, colorcolumn = "101", expandtab = false },
+	["*.h"] = { ts = 4, shiftwidth = 4, colorcolumn = "101", expandtab = false },
+	["*.py"] = { ts = 3, shiftwidth = 3, colorcolumn = "86", expandtab = false },
+	["*.html"] = { ts = 4, shiftwidth = 4, colorcolumn = "101", expandtab = false },
+	["*.Jenkinsfile"] = { ts = 4, shiftwidth = 4, colorcolumn = "101", expandtab = false },
 }
 
 for pattern, settings in pairs(filetype_settings) do
@@ -1070,6 +1070,7 @@ for pattern, settings in pairs(filetype_settings) do
 			vim.bo.ts = settings["ts"]
 			vim.bo.shiftwidth = settings["shiftwidth"]
 			vim.wo.colorcolumn = settings["colorcolumn"]
+			vim.bo.expandtab = settings["expandtab"]
 		end,
 	})
 end
