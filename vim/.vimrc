@@ -82,10 +82,11 @@ nnoremap <leader>tree :NERDTree<CR>
 nnoremap <leader>id   :Lid<CR>
 
 " Settings for untyped files
-au BufWinEnter *      set ts=3 shiftwidth=3 colorcolumn=86,101
-au BufWinEnter *.log  set ts=4 shiftwidth=4 colorcolumn=0
-au BufWinEnter *.go   set ts=4 shiftwidth=4 colorcolumn=101
-au BufWinEnter *.c    set ts=4 shiftwidth=4 colorcolumn=101
-au BufWinEnter *.h    set ts=4 shiftwidth=4 colorcolumn=101
-au BufWinEnter *.py   set ts=3 shiftwidth=3 colorcolumn=86
-au BufWinEnter *.html set ts=4 shiftwidth=4 colorcolumn=101
+au BufWinEnter *             set ts=3 shiftwidth=3 colorcolumn=86,101
+au BufWinEnter *.log         set ts=4 shiftwidth=4 colorcolumn=0
+au BufWinEnter *.go          set ts=4 shiftwidth=4 colorcolumn=101
+au BufWinEnter *.c           set ts=4 shiftwidth=4 colorcolumn=101
+au BufWinEnter *.h           set ts=4 shiftwidth=4 colorcolumn=101
+au BufWinEnter *.py          set ts=3 shiftwidth=3 colorcolumn=86
+au BufWinEnter *.html 		  set ts=4 shiftwidth=4 colorcolumn=101
+au BufWinEnter *.Jenkinsfile set ts=4 shiftwidth=4 colorcolumn=101

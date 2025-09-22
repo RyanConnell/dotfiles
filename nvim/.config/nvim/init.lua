@@ -1032,6 +1032,7 @@ local filetype_settings = {
   ['*.h'] = { ts = 4, shiftwidth = 4, colorcolumn = '101' },
   ['*.py'] = { ts = 3, shiftwidth = 3, colorcolumn = '86' },
   ['*.html'] = { ts = 4, shiftwidth = 4, colorcolumn = '101' },
+  ['*.Jenkinsfile'] = { ts = 4, shiftwidth = 4, colorcolumn = '101' },
 }
 
 for pattern, settings in pairs(filetype_settings) do
