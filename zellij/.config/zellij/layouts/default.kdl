@@ -1,0 +1,41 @@
+layout {
+    pane size=1 borderless=true {
+        plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
+            hide_frame_for_single_pane "false"
+
+            format_left  "{mode} (#[fg=#89B4FA,bg=#181825,bold]{session}#[bg=#181825]) {tabs}"
+            format_right "{command_ai_usage}#[fg=#424554,bg=#181825]::{command_kubectl_ctx}#[fg=#424554,bg=#181825]::{datetime}"
+            format_space "X#[bg=#181825]"
+
+            mode_normal          "Zellij"
+            mode_tmux            "Zellij"
+            mode_default_to_mode "tmux"
+
+            tab_normal               "#[fg=#181825,bg=#313244]#[fg=#A8ADC8,bg=#313244] {index}:{name} {fullscreen_indicator}{sync_indicator}{floating_indicator}#[fg=#313244,bg=#181825]"
+            tab_active               "#[fg=#181825,bg=#90B4FA]#[fg=#11111B,bg=#89B4FA,bold] {index}:{name} {fullscreen_indicator}{sync_indicator}{floating_indicator}#[fg=#89B4FA,bg=#181825]"
+            tab_fullscreen_indicator "(Fullscreen)"
+            tab_sync_indicator       "(Sync)"
+            tab_floating_indicator   ""
+
+            command_ai_usage_command  "sh -c 'python3 $HOME/.config/zellij/plugin-data/zjstatus/ai-proxy-budget.py'"
+            command_ai_usage_format   "#[fg=#9399B2,bg=#181825] Budget:{stdout}{stderr} "
+            command_ai_usage_interval "60"
+
+            command_kubectl_ctx_command  "sh -c 'cat ~/.kube/config | yq .current-context'"
+            command_kubectl_ctx_format   "#[fg=#9399B2,bg=#181825] Cluster:{stdout} "
+            command_kubectl_ctx_interval "60"
+
+            datetime          "#[fg=#9399B2,bg=#181825] {format} "
+            datetime_format   "%A, %d %b %Y %H:%M"
+            datetime_timezone "Europe/Dublin"
+        }
+    }
+
+    pane split_direction="vertical" {
+        pane
+    }
+
+    pane size=1 borderless=true {
+        plugin location="zellij:status-bar"
+    }
+}
