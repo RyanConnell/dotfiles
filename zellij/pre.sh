@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-ZELLIJ_VERSION="v0.43.1"
+ZELLIJ_VERSION="v0.44.3"
 
 # --- Zellij Installation ---
 installed_version=""

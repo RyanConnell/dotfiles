@@ -3,7 +3,7 @@ set -e
 
 plugin_directory="$HOME/.config/zellij/plugins"
 plugins=(
-    "https://github.com/dj95/zjstatus/releases/download/v0.22.0/zjstatus.wasm"
+    "https://github.com/dj95/zjstatus/releases/download/v0.23.0/zjstatus.wasm"
 )
 
 mkdir -p "$plugin_directory"
