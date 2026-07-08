@@ -1,0 +1,32 @@
+{
+  "allowNonWorkspaceAccess": true,
+  "colorScheme": "dark",
+  "editor": "vim",
+  "model": "Gemini 3.5 Flash (Medium)",
+  "notifications": true,
+  "permissions": {
+    "allow": [
+      "unsandboxed(go build ./...)",
+      "command(echo)",
+      "command(ps)",
+      "command(grep)",
+      "command(find)",
+      "command(lsblk)",
+      "command(ls)",
+      "command(git branch)",
+      "command(git worktree)",
+      "command(kubectl get)",
+      "command(hostname)",
+      "command(ip)",
+      "command(git add)",
+      "command(git status)",
+      "command(git diff)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "sh ~/.gemini/antigravity-cli/statusline.sh",
+    "enabled": true
+  },
+  "toolPermission": "proceed-in-sandbox"
+}

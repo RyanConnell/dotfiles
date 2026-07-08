@@ -18,12 +18,6 @@ apps:
     enabled: {{ or (eq .Environment "home-pc") (eq .Environment "home-laptop") }}
   nvim:
     enabled: {{ ne .Environment "raspberry-pi" }}
-  ollama:
-    enabled: {{ eq .Environment "home-pc" }}
-  opencode:
-    enabled: {{ eq .Environment "home-pc" }}
-    vars:
-      default_model_id: "ollama/gemma4-64k"
   pi-harness:
     enabled: {{ eq .Environment "home-pc" }}
   vim:
