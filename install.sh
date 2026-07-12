@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PACKAGES=$(ls -d */ | sed 's/\///' | grep -v "backups" | xargs)
+PACKAGES=$(ls -d apps/* | sed 's/apps\///' | sed 's/\///' | grep -v "backups" | xargs)
 
 # --- Ensure that Stow is installed ---
 if ! command -v stow >/dev/null 2>&1; then
@@ -26,8 +26,8 @@ BACKUP_DIR="backups"
 
 # --- Run Package Pre-Install Scripts ---
 for pkg in $PACKAGES; do
-    if [ -f "${pkg}/pre.sh" ]; then
-        /bin/bash "${pkg}/pre.sh" | sed "s/^/[${pkg}\/pre.sh]: /"
+    if [ -f "apps/${pkg}/pre.sh" ]; then
+        /bin/bash "apps/${pkg}/pre.sh" | sed "s/^/[${pkg}\/pre.sh]: /"
     fi
 done
 
@@ -35,13 +35,13 @@ done
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 for pkg in $PACKAGES; do
     # Attempt to stow
-    if ! stow -R "${pkg}" --ignore '(pre|post).sh' -t $HOME; then
+    if ! stow -d apps -R "${pkg}" --ignore '(pre|post).sh' -t $HOME; then
         echo "Stow for '${pkg}' failed; Attempting to backup files"
         # Find all files in the package directory, excluding pre/post scripts
-        files=$(find "$pkg" -type f -not -path "*/pre.sh" -not -path "*/post.sh")
+        files=$(find "apps/$pkg" -type f -not -path "*/pre.sh" -not -path "*/post.sh")
 
         # --- Backup any existing files to avoid loss of data ---
-        for file in ${files#$pkg/}; do
+        for file in ${files#apps/$pkg/}; do
             target_file="$HOME/$file"
             if [ -f "$target_file" ] && [ ! -L "$target_file" ]; then
                 backup_file="$BACKUP_DIR/$TIMESTAMP/$file"
@@ -52,14 +52,14 @@ for pkg in $PACKAGES; do
         done
 
         # Attempt to stow again now that the files have been moved.
-        stow -R "$pkg" --ignore '(pre|post).sh' -t $HOME
+        stow -d apps -R "$pkg" --ignore '(pre|post).sh' -t $HOME
     fi
 done
 
 # --- Run Package Post-Install Scripts ---
 for pkg in $PACKAGES; do
-    if [ -f "${pkg}/post.sh" ]; then
-        /bin/bash "${pkg}/post.sh" | sed "s/^/[${pkg}\/post.sh]: /"
+    if [ -f "apps/${pkg}/post.sh" ]; then
+        /bin/bash "apps/${pkg}/post.sh" | sed "s/^/[${pkg}\/post.sh]: /"
     fi
 done
 
