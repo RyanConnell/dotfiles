@@ -4,7 +4,12 @@ layout {
             hide_frame_for_single_pane "false"
 
             format_left  "{mode} (#[fg=#89B4FA,bg=#181825,bold]{session}#[bg=#181825]) {tabs}"
+            {{ if .Vars.ai_budget_enabled -}}
             format_right "{command_ai_usage}#[fg=#424554,bg=#181825]::{command_kubectl_ctx}#[fg=#424554,bg=#181825]::{datetime}"
+            {{ else -}}
+            format_right "{command_kubectl_ctx}#[fg=#424554,bg=#181825]::{datetime}"
+            {{ end -}}
+
             format_space "X#[bg=#181825]"
 
             mode_normal          "Zellij"
@@ -17,9 +22,11 @@ layout {
             tab_sync_indicator       "(Sync)"
             tab_floating_indicator   ""
 
+            {{ if.Vars.ai_budget_enabled -}}
             command_ai_usage_command  "sh -c 'python3 $HOME/.config/zellij/plugin-data/zjstatus/ai-proxy-budget.py'"
             command_ai_usage_format   "#[fg=#9399B2,bg=#181825] Budget:{stdout}{stderr} "
             command_ai_usage_interval "60"
+            {{ end -}}
 
             command_kubectl_ctx_command  "sh -c 'cat ~/.kube/config | yq .current-context'"
             command_kubectl_ctx_format   "#[fg=#9399B2,bg=#181825] Cluster:{stdout} "
