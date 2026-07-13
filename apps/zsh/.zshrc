@@ -22,7 +22,7 @@ alias vim="nvim"
 
 # Custom Environment Variables
 export GOPATH=$HOME/golang
-export PATH=$PATH:$HOME/golang/bin:/usr/local/go/bin:$HOME/bin:/opt/homebrew/bin:$HOME/.local/bin
+export PATH=$PATH:$HOME/golang/bin:/usr/local/go/bin:$HOME/bin:/opt/homebrew/bin:$HOME/.local/bin:$HOME/.opencode/bin
 export EDITOR=vim
 export VISUAL=vim
 

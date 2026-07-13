@@ -21,9 +21,9 @@ until curl -s http://localhost:11434/ >/dev/null; do
     sleep 1
 done
 
-echo "Pulling local LLM models (this may take a few minutes)..."
-ollama pull gemma4:26b || echo "Warning: Failed to pull gemma4:26b. Please pull manually later."
-ollama pull qwen3.5:35b || echo "Warning: Failed to pull qwen3.5:35b. Please pull manually later."
+echo "Pulling local LLM models (this may take a while)..."
+ollama pull gemma4:26b || echo "Warning: Failed to pull gemma4:26b"
+ollama pull qwen3.6:27b-q4_K_M || echo "Warning: Failed to pull qwen3.6:27b-q4_K_M"
 
 # Customise gemma4:26b with a 64k context window and 4k predict limit
 if ! ollama list | grep -q "gemma4-64k"; then
@@ -35,5 +35,18 @@ PARAMETER num_ctx 65536
 PARAMETER num_predict 4096
 EOF
     ollama create gemma4-64k -f "$TEMP_DIR/Modelfile"
+    rm -rf "$TEMP_DIR"
+fi
+
+# Customise qwen3.6:27b-q4_K_M with a 128k context window and 4k predict limit
+if ! ollama show --modelfile qwen3.6:27b-q4_K_M 2>/dev/null | grep -q "num_ctx 131072"; then
+    echo "Creating qwen3.6:27b-q4_K_M custom model with 128k context window in Ollama..."
+    TEMP_DIR=$(mktemp -d)
+    cat <<EOF > "$TEMP_DIR/Modelfile"
+FROM qwen3.6:27b-q4_K_M
+PARAMETER num_ctx 131072
+PARAMETER num_predict 4096
+EOF
+    ollama create qwen3.6:27b-q4_K_M -f "$TEMP_DIR/Modelfile"
     rm -rf "$TEMP_DIR"
 fi
