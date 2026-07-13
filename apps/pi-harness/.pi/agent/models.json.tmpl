@@ -1,0 +1,27 @@
+{
+  "providers": {
+    "ollama": {
+      "baseUrl": "http://localhost:11434/v1",
+      "api": "openai-completions",
+      "apiKey": "ollama",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false,
+        "maxTokensField": "max_tokens"
+      },
+      "models": [
+      {{- $first := true }}
+      {{- range $id, $model := .Globals.models }}
+        {{- if not $first }},{{ end }}
+        {
+            "id": "{{ $id }}",
+            "name": "{{ $model.name }}",
+            "contextWindow": {{ $model.ctx }},
+            "maxTokens": {{ $model.max_output }}
+        }
+        {{- $first = false }}
+      {{- end }}
+      ]
+    }
+  }
+}
