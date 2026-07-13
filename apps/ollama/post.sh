@@ -25,13 +25,14 @@ echo "Pulling local LLM models (this may take a few minutes)..."
 ollama pull gemma4:26b || echo "Warning: Failed to pull gemma4:26b. Please pull manually later."
 ollama pull qwen3.5:35b || echo "Warning: Failed to pull qwen3.5:35b. Please pull manually later."
 
-# Customise gemma4:26b with a 64k context window
+# Customise gemma4:26b with a 64k context window and 4k predict limit
 if ! ollama list | grep -q "gemma4-64k"; then
     echo "Creating gemma4-64k model in Ollama..."
     TEMP_DIR=$(mktemp -d)
     cat <<EOF > "$TEMP_DIR/Modelfile"
 FROM gemma4:26b
 PARAMETER num_ctx 65536
+PARAMETER num_predict 4096
 EOF
     ollama create gemma4-64k -f "$TEMP_DIR/Modelfile"
     rm -rf "$TEMP_DIR"
