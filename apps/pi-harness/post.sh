@@ -27,19 +27,3 @@ install_if_missing npm:@d3ara1n/pi-session-namer
 install_if_missing npm:pi-web-access
 install_if_missing npm:pi-vimmode
 install_if_missing npm:pi-bash-live-view
-
-# -------- Models -------- #
-
-# Customise Gemma4:26b with a 64k context window
-if ! ollama list | grep -q "gemma4-64k"; then
-    echo "Creating gemma4-64k model in Ollama..."
-    TEMP_DIR=$(mktemp -d)
-    cat <<EOF > "$TEMP_DIR/Modelfile"
-FROM gemma4:26b
-PARAMETER num_ctx 65536
-EOF
-    ollama create gemma4-64k -f "$TEMP_DIR/Modelfile"
-    rm -rf "$TEMP_DIR"
-else
-    echo "gemma4-64k is already built in Ollama."
-fi
