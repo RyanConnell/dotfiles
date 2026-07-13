@@ -18,6 +18,8 @@ apps:
     enabled: {{ or (eq .Environment "home-pc") (eq .Environment "home-laptop") }}
   nvim:
     enabled: {{ ne .Environment "raspberry-pi" }}
+  opencode:
+    enabled: {{ eq .Environment "home-pc" }}
   pi-harness:
     enabled: {{ eq .Environment "home-pc" }}
   vim:

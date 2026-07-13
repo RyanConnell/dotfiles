@@ -1,0 +1,56 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "compaction": {
+    "auto": true,
+    "prune": true
+  },
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1",
+        "apiKey": "ollama"
+      },
+       "models": {
+          "gemma4-64k": { "name": "Gemma 4 26B (64K)", "limit": { "context": 64000, "output": 8192 } },
+          "qwen3.5:35b": { "name": "Qwen 3.5 35B", "limit": { "context": 32768, "output": 4096 } }
+       }
+    }
+  },
+  "model": "ollama/gemma4-64k",
+  "permission": {
+    "read": "allow",
+    "write": "allow",
+    "edit": "allow",
+    "bash": {
+      "*": "ask",
+      "git *": "allow",
+      "npm *": "allow",
+      "pnpm *": "allow",
+      "yarn *": "allow",
+      "go *": "allow",
+      "kubectl *": "allow",
+      "ls *": "allow",
+      "cat *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "find *": "allow",
+      "grep *": "allow",
+      "cd *": "allow",
+      "mkdir *": "allow",
+      "python *": "allow",
+      "pip *": "allow",
+      "docker *": "allow",
+      "tree *": "allow",
+      "du *": "allow",
+      "df *": "allow",
+      "ps *": "allow",
+      "top *": "allow",
+      "touch *": "allow",
+      "rm *": "deny",
+      "sudo *": "deny",
+      "jq *": "allow"
+    }
+  }
+}
