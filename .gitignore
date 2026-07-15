@@ -2,5 +2,4 @@
 backups/
 lazy-lock.json
 apps/zsh/.local-zshrc
-apps/zellij/.config/**/*.wasm
-apps/pi-harness/.pi/agent/
+build/
