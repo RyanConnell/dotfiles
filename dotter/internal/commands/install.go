@@ -39,23 +39,10 @@ func (cmd *Installer) Run() error {
 
 	// Do a quick pre-check at the beginning of the run to make sure we aren't overwriting any
 	// newer content from the build directory.
-	var combinedDiff string
-	for _, app := range applications {
-		source := filepath.Join(cmd.Apps, app.Name)
-		target := filepath.Join(cmd.Output, app.Name)
-		diff, err := app.Differences(target, source)
-		if err != nil {
-			return fmt.Errorf("failed to capture differences between %q and %q: %v",
-				source, target, err)
-		}
-		if diff == "" {
-			continue
-		}
-		combinedDiff += fmt.Sprintf("%s\n", diff)
-	}
-	if combinedDiff != "" {
+	diff, err := fullAppDiff(applications, cmd.Apps, cmd.Output)
+	if diff != "" {
 		fmt.Printf("Found differences between %q and %q:\n\n%s\n",
-			cmd.Apps, cmd.Output, combinedDiff)
+			cmd.Apps, cmd.Output, diff)
 		if !userWantsToContinue() {
 			return fmt.Errorf("User aborted operation")
 		}

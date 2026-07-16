@@ -9,11 +9,13 @@ import (
 )
 
 type Flags struct {
-	Config  string `help:"Path to config file" default:"config.yaml" short:"c" type:"path"`
-	Apps    string `help:"Path to apps folder" default:"apps" short:"a" type:"path"`
-	Install struct {
-		Output string `help:"Path to output folder" short:"o" type:"path"`
-	} `cmd:"install" help:"Install templates"`
+	Config string `help:"Path to config file" default:"config.yaml" short:"c" type:"path"`
+	Apps   string `help:"Path to apps folder" default:"apps" short:"a" type:"path"`
+	Output string `help:"Path to output folder" short:"o" type:"path"`
+
+	// Subcommands
+	Install struct{} `cmd:"install" help:"Install templates"`
+	Diff    struct{} `cmd:"diff" help:"Determined what would be installed"`
 }
 
 func main() {
@@ -27,7 +29,10 @@ func main() {
 	var err error
 	switch ctx.Command() {
 	case "install":
-		cmd := commands.NewInstaller(flags.Config, flags.Apps, flags.Install.Output)
+		cmd := commands.NewInstaller(flags.Config, flags.Apps, flags.Output)
+		err = cmd.Run()
+	case "diff":
+		cmd := commands.NewDiffer(flags.Config, flags.Apps, flags.Output)
 		err = cmd.Run()
 	default:
 		err = fmt.Errorf("unknown subcommand")
