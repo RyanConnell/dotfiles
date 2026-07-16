@@ -74,11 +74,7 @@ func (a *App) MaybeRunScript(scriptName string) error {
 // Render copies the applications files to the output directory.
 func (a *App) Render(outputDir string) error {
 	var err error
-	for _, file := range a.Files {
-		if _, ok := ignoredFiles[file]; ok {
-			continue
-		}
-
+	for _, file := range a.StowableFiles() {
 		sourceFilePath := filepath.Join(a.SourcePath, file)
 		targetFilePath := filepath.Join(outputDir, a.Name, file)
 		if strings.HasSuffix(file, ".tmpl") {
@@ -127,8 +123,24 @@ func (a *App) renderTemplate(sourceFilePath, targetFilePath string) error {
 	return tmpl.Execute(targetFile, a.AppTemplateData)
 }
 
+func (a *App) StowableFiles() []string {
+	var stowable []string
+	for _, file := range a.Files {
+		if _, ok := ignoredFiles[file]; ok {
+			continue
+		}
+		stowable = append(stowable, file)
+	}
+	return stowable
+}
+
 // Stow attempts to use 'stow' to install an applications config files
 func (a *App) Stow(outputDir string, adopt bool) ([]string, error) {
+	if len(a.StowableFiles()) == 0 {
+		// Skip running stow if we have nothing to stow.
+		return nil, nil
+	}
+
 	stowArgs := []string{
 		"-d", outputDir,
 		"-t", os.Getenv("HOME"),
@@ -168,10 +180,7 @@ func (a *App) Stow(outputDir string, adopt bool) ([]string, error) {
 // Differences returns a diff between the two directories, excluding ignored files.
 func (a *App) Differences(sourceDir, targetDir string) (string, error) {
 	var combinedDiff string
-	for _, file := range a.Files {
-		if _, ok := ignoredFiles[file]; ok {
-			continue
-		}
+	for _, file := range a.StowableFiles() {
 		diff, err := a.DiffFiles(filepath.Join(sourceDir, file), filepath.Join(targetDir, file))
 		if err != nil {
 			return "", err
