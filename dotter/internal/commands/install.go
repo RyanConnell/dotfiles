@@ -48,17 +48,23 @@ func (cmd *Installer) Run() error {
 		}
 	}
 
+	failures := make(map[string]error)
+	fail := func(appName, message string, args ...any) {
+		fmt.Printf("[%s]: ERROR: %s; Skipping\n", appName, fmt.Sprintf(message, args...))
+		failures[appName] = fmt.Errorf("%s", fmt.Sprintf(message, args...))
+	}
+
 	for _, app := range applications {
 		fmt.Println("\n---------------------------------")
 		fmt.Printf("[%s]: Running pre.sh...\n", app.Name)
 		if err := app.MaybeRunScript("pre.sh"); err != nil {
-			fmt.Printf("[%s]: ERROR: %v; Skipping\n", app.Name, err)
+			fail(app.Name, "failed running pre.sh: %v", err)
 			continue
 		}
 
 		fmt.Printf("[%s]: Stowing package...\n", app.Name)
 		if err := app.Render(cmd.Output); err != nil {
-			fmt.Printf("[%s]: ERROR: %v; Skipping\n", app.Name, err)
+			fail(app.Name, "failed rendering package: %v", err)
 			continue
 		}
 		// Check if there are any conflicts that need interactive handling
@@ -66,19 +72,24 @@ func (cmd *Installer) Run() error {
 		if len(conflicts) != 0 {
 			err = cmd.handleConflicts(app, cmd.Output, conflicts)
 			if err != nil {
-				fmt.Printf("[%s]: ERROR: failed conflict resolution: %v; Skipping\n", app.Name, err)
+				fail(app.Name, "failed conflict resolution: %v", err)
 				continue
 			}
 		} else if err != nil {
-			fmt.Printf("[%s]: ERROR: initial stow failed: %v; Skipping\n", app.Name, err)
+			fail(app.Name, "initial stow failed: %v", err)
 			continue
 		}
 
 		fmt.Printf("[%s]: Running post.sh...\n", app.Name)
 		if err := app.MaybeRunScript("post.sh"); err != nil {
-			fmt.Printf("[%s]: ERROR: %v; Skipping\n", app.Name, err)
+			fail(app.Name, "failed running post.sh: %v", err)
 			continue
 		}
+	}
+
+	fmt.Printf("\n=================================\n%d Failures occurred\n", len(failures))
+	for appName, failure := range failures {
+		fmt.Printf("- %q: %v\n", appName, failure)
 	}
 
 	return nil
