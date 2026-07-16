@@ -37,6 +37,30 @@ func (cmd *Installer) Run() error {
 		return fmt.Errorf("failed to load apps from directory: %w", err)
 	}
 
+	// Do a quick pre-check at the beginning of the run to make sure we aren't overwriting any
+	// newer content from the build directory.
+	var combinedDiff string
+	for _, app := range applications {
+		source := filepath.Join(cmd.Apps, app.Name)
+		target := filepath.Join(cmd.Output, app.Name)
+		diff, err := app.Differences(target, source)
+		if err != nil {
+			return fmt.Errorf("failed to capture differences between %q and %q: %v",
+				source, target, err)
+		}
+		if diff == "" {
+			continue
+		}
+		combinedDiff += fmt.Sprintf("%s\n", diff)
+	}
+	if combinedDiff != "" {
+		fmt.Printf("Found differences between %q and %q:\n\n%s\n",
+			cmd.Apps, cmd.Output, combinedDiff)
+		if !userWantsToContinue() {
+			return fmt.Errorf("User aborted operation")
+		}
+	}
+
 	for _, app := range applications {
 		fmt.Println("\n---------------------------------")
 		fmt.Printf("[%s]: Running pre.sh...\n", app.Name)
@@ -79,7 +103,9 @@ func (cmd *Installer) handleConflicts(app *apps.App, outputDir string, conflicts
 
 	hasDifferences := false
 	for _, relPath := range conflicts {
-		diff, err := app.Diff(relPath, cmd.Output)
+		source := filepath.Join(cmd.Output, app.Name, relPath)
+		target := filepath.Join(os.Getenv("HOME"), relPath)
+		diff, err := apps.DiffFiles(source, target)
 		if err != nil {
 			return fmt.Errorf("failed to check diff for %s: %w", relPath, err)
 		}
@@ -103,11 +129,7 @@ func (cmd *Installer) handleConflicts(app *apps.App, outputDir string, conflicts
 	}
 
 	// Prompt the user for adoption
-	fmt.Print("\nDifferences found. Do you want to adopt these changes and re-render? (y/N): ")
-	var response string
-	_, _ = fmt.Scanln(&response)
-
-	if strings.ToLower(response) == "y" {
+	if userWantsToContinue() {
 		fmt.Printf("[%s]: Adopting and overwriting content...\n", app.Name)
 		_, err := app.Stow(outputDir, true)
 		if err != nil {
@@ -115,6 +137,12 @@ func (cmd *Installer) handleConflicts(app *apps.App, outputDir string, conflicts
 		}
 		return app.Render(outputDir)
 	}
-
 	return errors.New("user declined override")
+}
+
+func userWantsToContinue() bool {
+	fmt.Print("Do you want to continue? (y/N): ")
+	var response string
+	_, _ = fmt.Scanln(&response)
+	return strings.ToLower(response) == "y"
 }

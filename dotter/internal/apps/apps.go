@@ -67,25 +67,6 @@ func (a *App) Render(outputDir string) error {
 	return nil
 }
 
-func (a *App) Diff(relativePath, outputDir string) (string, error) {
-	source := filepath.Join(outputDir, a.Name, relativePath)
-	target := filepath.Join(os.Getenv("HOME"), relativePath)
-
-	cmd := exec.Command("diff", "-u", source, target)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() == 1 {
-			return out.String(), nil
-		}
-		return "", err
-	}
-
-	return "", nil
-}
-
 // Stow attempts to use 'stow' to install an applications config files
 func (a *App) Stow(outputDir string, adopt bool) ([]string, error) {
 	stowArgs := []string{
@@ -122,6 +103,25 @@ func (a *App) Stow(outputDir string, adopt bool) ([]string, error) {
 		return conflicts, fmt.Errorf("%v: %v", err, stderrStr)
 	}
 	return conflicts, nil
+}
+
+// Differences returns a diff between the two directories, excluding ignored files.
+func (a *App) Differences(sourceDir, targetDir string) (string, error) {
+	var combinedDiff string
+	for _, file := range a.Files {
+		if _, ok := ignoredFiles[file]; ok {
+			continue
+		}
+		diff, err := DiffFiles(filepath.Join(sourceDir, file), filepath.Join(targetDir, file))
+		if err != nil {
+			return "", err
+		}
+		if diff == "" {
+			continue
+		}
+		combinedDiff += fmt.Sprintf("%s\n", diff)
+	}
+	return combinedDiff, nil
 }
 
 // DiscoverApps walks the app folder to gather information about all available apps.
@@ -186,4 +186,21 @@ func copyFile(src, dest string) error {
 
 	_, err = io.Copy(destFile, sourceFile)
 	return err
+}
+
+// DiffFiles returns the diff between two files.
+func DiffFiles(source, target string) (string, error) {
+	cmd := exec.Command("diff", "--color=always", "-u", source, target)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() == 1 {
+			return out.String(), nil
+		}
+		return "", err
+	}
+
+	return "", nil
 }
