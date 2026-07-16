@@ -55,6 +55,12 @@ func (cmd *Installer) Run() error {
 	}
 
 	for _, app := range applications {
+		if !cfg.AppConfig(app.Name).Enabled {
+			fmt.Println("\n---------------------------------")
+			fmt.Printf("Skipping %q as it is not enabled on %q\n", app.Name, envType)
+			continue
+		}
+
 		fmt.Println("\n---------------------------------")
 		fmt.Printf("[%s]: Running pre.sh...\n", app.Name)
 		if err := app.MaybeRunScript("pre.sh"); err != nil {
