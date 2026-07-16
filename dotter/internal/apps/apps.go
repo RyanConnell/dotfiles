@@ -221,6 +221,12 @@ func (a *App) DiffFiles(source, target string) (string, error) {
 		source = tmpFile.Name()
 	}
 
+	// If the target file doesn't exist at all, report it as entirely new.
+	if _, err := os.Stat(target); errors.Is(err, os.ErrNotExist) {
+		return fmt.Sprintf("\033[1m--- %s\n+++ %s\033[0m\n\033[1;32m<entirely new>\033[0m\n",
+			target, source), nil
+	}
+
 	cmd := exec.Command("diff", "--color=always", "-u", target, source)
 	var out bytes.Buffer
 	cmd.Stdout = &out

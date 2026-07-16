@@ -61,6 +61,7 @@ func fullAppDiff(applications []*apps.App, appDir, outputDir string) (string, er
 		if diff == "" {
 			continue
 		}
+		combinedDiff += fmt.Sprintf("%s\n", diff)
 	}
 	return combinedDiff, nil
 }
