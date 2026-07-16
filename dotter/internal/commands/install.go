@@ -27,12 +27,12 @@ func (cmd *Installer) Run() error {
 		return fmt.Errorf("failed to determine environment type: %w", err)
 	}
 
-	_, err = config.NewConfig(cmd.Config, envType)
+	cfg, err := config.NewConfig(cmd.Config, envType)
 	if err != nil {
 		return fmt.Errorf("failed to parse config file: %w", err)
 	}
 
-	applications, err := apps.DiscoverApps(cmd.Apps)
+	applications, err := apps.DiscoverApps(cmd.Apps, envType, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to load apps from directory: %w", err)
 	}
@@ -64,7 +64,8 @@ func (cmd *Installer) Run() error {
 		// Check if there are any conflicts that need interactive handling
 		conflicts, err := app.Stow(cmd.Output, false)
 		if len(conflicts) != 0 {
-			if err = cmd.handleConflicts(app, cmd.Output, conflicts); err != nil {
+			err = cmd.handleConflicts(app, cmd.Output, conflicts)
+			if err != nil {
 				fmt.Printf("[%s]: ERROR: failed conflict resolution: %v; Skipping\n", app.Name, err)
 				continue
 			}
@@ -92,7 +93,7 @@ func (cmd *Installer) handleConflicts(app *apps.App, outputDir string, conflicts
 	for _, relPath := range conflicts {
 		source := filepath.Join(cmd.Output, app.Name, relPath)
 		target := filepath.Join(os.Getenv("HOME"), relPath)
-		diff, err := apps.DiffFiles(source, target)
+		diff, err := app.DiffFiles(source, target)
 		if err != nil {
 			return fmt.Errorf("failed to check diff for %s: %w", relPath, err)
 		}

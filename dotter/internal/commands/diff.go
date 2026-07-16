@@ -24,20 +24,19 @@ func (cmd *Differ) Run() error {
 		return fmt.Errorf("failed to determine environment type: %w", err)
 	}
 
-	_, err = config.NewConfig(cmd.Config, envType)
+	cfg, err := config.NewConfig(cmd.Config, envType)
 	if err != nil {
 		return fmt.Errorf("failed to parse config file: %w", err)
 	}
 
-	applications, err := apps.DiscoverApps(cmd.Apps)
+	applications, err := apps.DiscoverApps(cmd.Apps, envType, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to load apps from directory: %w", err)
 	}
 
 	diff, err := fullAppDiff(applications, cmd.Apps, cmd.Output)
 	if err != nil {
-		return fmt.Errorf("failed to capture differences between %q and %q: %v",
-			cmd.Apps, cmd.Output, err)
+		return err
 	}
 
 	if diff != "" {
@@ -54,7 +53,7 @@ func fullAppDiff(applications []*apps.App, appDir, outputDir string) (string, er
 	for _, app := range applications {
 		source := filepath.Join(appDir, app.Name)
 		target := filepath.Join(outputDir, app.Name)
-		diff, err := app.Differences(target, source)
+		diff, err := app.Differences(source, target)
 		if err != nil {
 			return "", fmt.Errorf("failed to capture differences between %q and %q: %v",
 				source, target, err)
