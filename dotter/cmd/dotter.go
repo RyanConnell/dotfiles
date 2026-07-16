@@ -14,8 +14,10 @@ type Flags struct {
 	Output string `help:"Path to output folder" short:"o" type:"path"`
 
 	// Subcommands
-	Install struct{} `cmd:"install" help:"Install templates"`
-	Diff    struct{} `cmd:"diff" help:"Determined what would be installed"`
+	Install struct {
+		NoStow bool `help:"Don't invoke 'stow' during installation"`
+	} `cmd:"install" help:"Install templates"`
+	Diff struct{} `cmd:"diff" help:"Determined what would be installed"`
 }
 
 func main() {
@@ -29,7 +31,7 @@ func main() {
 	var err error
 	switch ctx.Command() {
 	case "install":
-		cmd := commands.NewInstaller(flags.Config, flags.Apps, flags.Output)
+		cmd := commands.NewInstaller(flags.Config, flags.Apps, flags.Output, flags.Install.NoStow)
 		err = cmd.Run()
 	case "diff":
 		cmd := commands.NewDiffer(flags.Config, flags.Apps, flags.Output)

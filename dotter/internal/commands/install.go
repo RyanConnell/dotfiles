@@ -15,10 +15,11 @@ type Installer struct {
 	Config string
 	Apps   string
 	Output string
+	NoStow bool
 }
 
-func NewInstaller(config, apps, output string) *Installer {
-	return &Installer{Config: config, Apps: apps, Output: output}
+func NewInstaller(config, apps, output string, noStow bool) *Installer {
+	return &Installer{Config: config, Apps: apps, Output: output, NoStow: noStow}
 }
 
 func (cmd *Installer) Run() error {
@@ -68,22 +69,25 @@ func (cmd *Installer) Run() error {
 			continue
 		}
 
-		fmt.Printf("[%s]: Stowing package...\n", app.Name)
+		fmt.Printf("[%s]: Rendering package...\n", app.Name)
 		if err := app.Render(cmd.Output); err != nil {
 			fail(app.Name, "failed rendering package: %v", err)
 			continue
 		}
-		// Check if there are any conflicts that need interactive handling
-		conflicts, err := app.Stow(cmd.Output, false)
-		if len(conflicts) != 0 {
-			err = cmd.handleConflicts(app, cmd.Output, conflicts)
-			if err != nil {
-				fail(app.Name, "failed conflict resolution: %v", err)
+		if !cmd.NoStow {
+			// Check if there are any conflicts that need interactive handling
+			fmt.Printf("[%s]: Stowing package...\n", app.Name)
+			conflicts, err := app.Stow(cmd.Output, false)
+			if len(conflicts) != 0 {
+				err = cmd.handleConflicts(app, cmd.Output, conflicts)
+				if err != nil {
+					fail(app.Name, "failed conflict resolution: %v", err)
+					continue
+				}
+			} else if err != nil {
+				fail(app.Name, "initial stow failed: %v", err)
 				continue
 			}
-		} else if err != nil {
-			fail(app.Name, "initial stow failed: %v", err)
-			continue
 		}
 
 		fmt.Printf("[%s]: Running post.sh...\n", app.Name)
