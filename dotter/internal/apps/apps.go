@@ -109,8 +109,19 @@ func (a *App) renderTemplate(sourceFilePath, targetFilePath string) error {
 		return err
 	}
 
-	// Render our template
-	// Write results to a file.
+	// Render template to a buffer first, so we can compare against the existing file.
+	var renderedBuf bytes.Buffer
+	if err := tmpl.Execute(&renderedBuf, a.AppTemplateData); err != nil {
+		return err
+	}
+
+	// Skip write if destination already has identical content.
+	existingData, err := os.ReadFile(targetFilePath)
+	if err == nil && bytes.Equal(renderedBuf.Bytes(), existingData) {
+		return nil
+	}
+
+	// Render our template and write results to the file.
 	sourceFileStat, err := sourceFile.Stat()
 	if err != nil {
 		return err
@@ -119,8 +130,10 @@ func (a *App) renderTemplate(sourceFilePath, targetFilePath string) error {
 	if err != nil {
 		return err
 	}
+	defer targetFile.Close()
 
-	return tmpl.Execute(targetFile, a.AppTemplateData)
+	_, err = io.Copy(targetFile, bytes.NewReader(renderedBuf.Bytes()))
+	return err
 }
 
 func (a *App) StowableFiles() []string {
@@ -285,7 +298,37 @@ func findFiles(sourcePath string) ([]string, error) {
 	return files, err
 }
 
+// filesEqual returns true if both files have identical content.
+// It first compares size (fast path), then falls back to full read comparison.
+func filesEqual(src, dest string) bool {
+	srcInfo, err := os.Stat(src)
+	if err != nil {
+		return false
+	}
+	destInfo, err := os.Stat(dest)
+	if err != nil {
+		return false
+	}
+	if srcInfo.Size() != destInfo.Size() {
+		return false
+	}
+	srcData, err := os.ReadFile(src)
+	if err != nil {
+		return false
+	}
+	destData, err := os.ReadFile(dest)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(srcData, destData)
+}
+
 func copyFile(src, dest string) error {
+	// Skip if destination already has identical content.
+	if filesEqual(src, dest) {
+		return nil
+	}
+
 	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 		return err
 	}
