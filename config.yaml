@@ -30,5 +30,3 @@ apps:
     enabled: {{ ne .Environment "raspberry-pi" }}
   zellij:
     enabled: true
-    vars:
-      ai_budget_enabled: {{ or (eq .Environment "arista-laptop") (eq .Environment "arista-server") }}
