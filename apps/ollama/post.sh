@@ -1,11 +1,15 @@
 #!/bin/bash
 set -e
 
+# ----- Install and Configure Ollama -----
+
 # Ensure Ollama service is running and enabled on boot
 if command -v systemctl >/dev/null 2>&1; then
-    echo "Enabling and starting Ollama service..."
-    sudo systemctl enable ollama || true
-    sudo systemctl start ollama || true
+    if ! systemctl is-active --quiet ollama 2>/dev/null; then
+        echo "Enabling and starting Ollama service..."
+        sudo systemctl enable ollama || true
+        sudo systemctl start ollama || true
+    fi
 fi
 
 # Wait for Ollama to become responsive
@@ -21,9 +25,25 @@ until curl -s http://localhost:11434/ >/dev/null; do
     sleep 1
 done
 
+
+# ----- Model Installation -----
+
+MODELS=$(ollama list | awk '{print $1}' | grep -v '^NAME$')
+maybe_install_model() {
+    if ! echo "$MODELS" | grep -q "^$1$"; then
+        echo "Installing $1. This may take some time..."
+        ollama pull $1 || echo "WARNING: failed to download $1"
+    else
+        echo "$1 already installed; Skipping"
+    fi
+}
+
 echo "Pulling local LLM models (this may take a while)..."
-ollama pull gemma4:26b || echo "Warning: Failed to pull gemma4:26b"
-ollama pull qwen3.6:27b-q4_K_M || echo "Warning: Failed to pull qwen3.6:27b-q4_K_M"
+maybe_install_model gemma4:26b
+maybe_install_model qwen3.6:27b-q4_K_M
+
+
+# ----- Model Customisation -----
 
 # Customise gemma4:26b with a 64k context window and 4k predict limit
 if ! ollama list | grep -q "gemma4-64k"; then
